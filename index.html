@@ -1,17 +1,102 @@
 ﻿<!DOCTYPE html>
-<html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Install Happy Couple</title>
+    <meta charset="utf-8" />
+    <title>Ktv FAQ</title>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" type="text/css" />
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+    <style>
+        tfoot {
+            display: table-header-group;
+        }
+
+        tfoot th input {
+            float: left;
+            width: 100%;
+        }
+    </style>
 </head>
+
 <body>
-    <div style="width: 128px; height: 128px; margin: auto;">
-        <a href="itms-services://?action=download-manifest&url=https://dl.dropboxusercontent.com/u/102568827/GreetingCardIpa/manifest.plist">
-            <img src="./Icon.png" width="128" height="128" />
-        </a>
-        <br />
-        TAP TO INSTALL
-    </div>
+    <table id="example" class="display" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>Дата публикации</th>
+                <th>Название ролика</th>
+                <th>Вопрос</th>
+                <th>Тэги</th>
+                <th>Сек</th>
+                <th>Ссылка</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <th>Дата публикации</th>
+                <th>Название ролика</th>
+                <th>Вопрос</th>
+                <th>Тэги</th>
+                <th>Сек</th>
+                <th>Ссылка</th>
+            </tr>
+        </tfoot>
+    </table>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            $('#example tfoot th').each(function () {
+                var title = $(this).text();
+                if (title != "Ссылка" && title != "Сек") {
+                    $(this).html('<input type="text" placeholder="Search ' + title + '" />');
+                }
+            });
+
+            $.getJSON("https://spreadsheets.google.com/feeds/list/1-MVggscH_a_6LPxylIa61KjlMbjRkjxUfH5cz87l7hI/3/public/full?alt=json", function (data) {
+
+                var gridData = [];
+
+                data.feed.entry.forEach(function (row) {
+                    gridData.push({
+                        date: row["gsx$date"]["$t"],
+                        videotitle: row["gsx$videotitle"]["$t"],
+                        question: row["gsx$question"]["$t"],
+                        link: '<a target="_blank" href="' + row["gsx$link"]["$t"] + '">Перейти</a>',
+                        duration: row["gsx$duration"]["$t"],
+                        tags: row["gsx$tags"]["$t"]
+                    });
+                });
+
+                var table = $('#example').DataTable({
+                    "data": gridData,
+                    "columns": [
+                        { "data": "date", "type": "date" },
+                        { "data": "videotitle" },
+                        { "data": "question" },
+                        { "data": "tags" },
+                        { "data": "duration" },
+                        { "data": "link" }
+                    ]
+                });
+
+                // Apply the search
+                table.columns().every(function () {
+                    var that = this;
+
+                    $('input', this.footer()).on('keyup change', function () {
+                        if (that.search() !== this.value) {
+                            that
+                                .search(this.value)
+                                .draw();
+                        }
+                    });
+                });
+            });
+        });
+
+
+    </script>
 </body>
+
 </html>
