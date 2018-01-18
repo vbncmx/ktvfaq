@@ -16,6 +16,21 @@
             float: left;
             width: 100%;
         }
+
+        p.tags {
+            font-size: 10pt;
+        }
+
+        div.question-text {
+            font-size: 14pt;
+        }
+
+        a.fragment-link {
+            width: 32px;
+            height: 24px;
+            display: block;
+            background: transparent url('yt.png') center top no-repeat;
+        }
     </style>
 </head>
 
@@ -23,32 +38,53 @@
     <table id="example" class="display" cellspacing="0" width="100%">
         <thead>
             <tr>
-                <th>Дата публикации</th>
-                <th>Название ролика</th>
+                <th></th>
                 <th>Вопрос</th>
-                <th>Тэги</th>
-                <th>Сек</th>
-                <th>Ссылка</th>
+                <th>Название ролика</th>
+                <th>Дата публикации</th>                
             </tr>
         </thead>
         <tfoot>
             <tr>
-                <th>Дата публикации</th>
-                <th>Название ролика</th>
+                <th></th>
                 <th>Вопрос</th>
-                <th>Тэги</th>
-                <th>Сек</th>
-                <th>Ссылка</th>
+                <th>Название ролика</th>
+                <th>Дата публикации</th>
             </tr>
         </tfoot>
     </table>
 
-    <script type="text/javascript">
+    <script type="text/javascript">        
+
+        function fancyTimeFormat(time) {
+            // Hours, minutes and seconds
+            var hrs = ~~(time / 3600);
+            var mins = ~~((time % 3600) / 60);
+            var secs = time % 60;
+
+            // Output like "1:01" or "4:03:59" or "123:03:59"
+            var ret = "";
+
+            if (hrs > 0) {
+                ret += "" + hrs + ":" + (mins < 10 ? "0" : "");
+            }
+
+            ret += "" + mins + ":" + (secs < 10 ? "0" : "");
+            ret += "" + secs;
+            return ret;
+        }
+
+        function getQuestionCellHtml(question, tags, duration) {
+            return '<div class="question-text">' + question
+                + ' (' + fancyTimeFormat(parseInt(duration))
+                + ')' + '</div>' + '<p class="tags">' + tags + '</p>';
+        }
+
         $(document).ready(function () {
 
             $('#example tfoot th').each(function () {
                 var title = $(this).text();
-                if (title != "Ссылка" && title != "Сек") {
+                if (title == "Вопрос" || title == "Дата публикации" || title == "Название ролика") {
                     $(this).html('<input type="text" placeholder="Search ' + title + '" />');
                 }
             });
@@ -61,8 +97,8 @@
                     gridData.push({
                         date: row["gsx$date"]["$t"],
                         videotitle: row["gsx$videotitle"]["$t"],
-                        question: row["gsx$question"]["$t"],
-                        link: '<a target="_blank" href="' + row["gsx$link"]["$t"] + '">Перейти</a>',
+                        question: getQuestionCellHtml(row["gsx$question"]["$t"], row["gsx$tags"]["$t"], row["gsx$duration"]["$t"]),
+                        link: '<a class="fragment-link" target="_blank" href="' + row["gsx$link"]["$t"] + '">',
                         duration: row["gsx$duration"]["$t"],
                         tags: row["gsx$tags"]["$t"]
                     });
@@ -71,12 +107,10 @@
                 var table = $('#example').DataTable({
                     "data": gridData,
                     "columns": [
-                        { "data": "date", "type": "date" },
-                        { "data": "videotitle" },
+                        { "data": "link" },
                         { "data": "question" },
-                        { "data": "tags" },
-                        { "data": "duration" },
-                        { "data": "link" }
+                        { "data": "videotitle" },
+                        { "data": "date", "type": "date" }
                     ]
                 });
 
