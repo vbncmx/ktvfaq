@@ -10,16 +10,11 @@
     <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.16/fh-3.1.3/sc-1.4.3/datatables.min.js"></script>
     <style>
         tfoot {
-            display: table-header-group;
-        }
-
-        tfoot th input {
-            float: left;
-            width: 100%;
+            display: none;
         }
 
         p.tags {
-            font-size: 1em;
+            font-size: 0.75em;
         }
 
         div.question-text {
@@ -28,6 +23,9 @@
 
         input.col-filter{
             font-size: 1em;
+            max-width: 100%;
+            min-width: 100px;
+            width: 100%;
         }
 
         a.fragment-link {
@@ -37,8 +35,17 @@
             background: transparent url('yt.png') center top no-repeat;
         }
 
-        .dataTables_filter{
+        .dataTables_filter {
             display: none;
+        }
+        
+        .col-header-table {
+            margin: 0;
+            max-width: 100%;            
+        }
+
+        .col-header-td{
+            border: none;
         }
     </style>
 </head>
@@ -49,16 +56,16 @@
             <tr>
                 <th></th>
                 <th>Вопрос</th>
-                <th>Название ролика</th>
-                <th>Дата публикации</th>                
+                <th>Видео</th>
+                <th>Дата</th>                
             </tr>
         </thead>
         <tfoot>
             <tr>
                 <th></th>
                 <th>Вопрос</th>
-                <th>Название ролика</th>
-                <th>Дата публикации</th>
+                <th>Видео</th>
+                <th>Дата</th>
             </tr>
         </tfoot>
     </table>
@@ -91,10 +98,12 @@
 
         $(document).ready(function () {
 
-            $('#example tfoot th').each(function () {
+            $('#example thead th').each(function () {
                 var title = $(this).text();
-                if (title == "Вопрос" || title == "Дата публикации" || title == "Название ролика") {
-                    $(this).html('<input class="col-filter" type="text" placeholder="Filter" />');
+                if (title == "Вопрос" || title == "Дата" || title == "Видео") {
+                    var html = '<table class="col-header-table" style="width: 90%"><tr><td style="border: none">' + title 
+                        + ':</td><td style="border: none; width: 100%"><input class="col-filter" type="text" placeholder="Filter" /></td></tr></table>';
+                    $(this).html(html);
                 }
             });
 
@@ -117,7 +126,7 @@
                     paging: false,
                     fixedHeader : true,
                     pageLength : 50,
-                    scrollY : '70vh',
+                    scrollY : '80vh',
                     sDom: 'Rfrtlip',
                     data: gridData,
                     columns: [
@@ -132,11 +141,9 @@
                 table.columns().every(function () {
                     var that = this;
 
-                    $('input', this.footer()).on('keyup change', function () {
+                    $('input', this.header()).on('keyup change', function () {
                         if (that.search() !== this.value) {
-                            that
-                                .search(this.value)
-                                .draw();
+                            that.search(this.value).draw();
                         }
                     });
                 });
