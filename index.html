@@ -51,7 +51,6 @@
 
         .modal-header{
             padding: 5px;
-            height: 40px;
         }
 
         .modal-header h4{
@@ -105,9 +104,9 @@
             var vpHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
             var dialogWidth = vpWidth > 650 ? 650 : vpWidth;
             var dialogHeight = 40 + 390 * (dialogWidth - 10) / 640;
-            if (vpHeight < dialogHeight)
+            if (vpHeight < dialogHeight) // mobile lanscape case
             {
-                dialogWidth = 10 + 640 * (vpHeight - 50) / 390;
+                dialogWidth = 10 + 640 * (vpHeight - 60) / 390;
             }
 
             $("#videoDialog").width(dialogWidth + "px");
