@@ -92,7 +92,14 @@
         function onYouTubeIframeAPIReady() {
 
             var vpWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+            var vpHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
             var dialogWidth = vpWidth > 650 ? 650 : vpWidth;
+            var dialogHeight = 390 * (dialogWidth - 10) / 640;
+            if (vpHeight < dialogHeight)
+            {
+                dialogWidth = 10 + 640 * (vpHeight - 10) / 390;
+            }
+
             $("#videoDialog").width(dialogWidth + "px");
 
             var playerWidth = dialogWidth - 10
