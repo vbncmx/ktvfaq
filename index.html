@@ -48,6 +48,16 @@
         .modal-body{
             padding: 5px;
         }
+
+        .modal-header{
+            padding: 5px;
+            height: 40px;
+        }
+
+        .modal-header h4{
+            font-size: 1em;
+            color: black;
+        }
     </style>
 </head>
 
@@ -94,10 +104,10 @@
             var vpWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
             var vpHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
             var dialogWidth = vpWidth > 650 ? 650 : vpWidth;
-            var dialogHeight = 390 * (dialogWidth - 10) / 640;
+            var dialogHeight = 40 + 390 * (dialogWidth - 10) / 640;
             if (vpHeight < dialogHeight)
             {
-                dialogWidth = 10 + 640 * (vpHeight - 10) / 390;
+                dialogWidth = 10 + 640 * (vpHeight - 50) / 390;
             }
 
             $("#videoDialog").width(dialogWidth + "px");
