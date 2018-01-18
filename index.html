@@ -21,13 +21,6 @@
             font-size: 1em;
         }
 
-        input.col-filter{
-            font-size: 1em;
-            max-width: 100%;
-            min-width: 100px;
-            width: 100%;
-        }
-
         a.fragment-link {
             width: 32px;
             height: 24px;
@@ -91,9 +84,9 @@
         }
 
         function getQuestionCellHtml(question, tags, duration) {
-            return '<div class="question-text">' + question
+            return '<div class="question-text" style="font-size: 1em;">' + question
                 + ' (' + fancyTimeFormat(parseInt(duration))
-                + ')' + '</div>' + '<p class="tags">' + tags + '</p>';
+                + ')' + '</div>' + '<p class="tags" style="font-size: 0.75em;">' + tags + '</p>';
         }
 
         $(document).ready(function () {
@@ -102,7 +95,7 @@
                 var title = $(this).text();
                 if (title == "Вопрос" || title == "Дата" || title == "Видео") {
                     var html = '<table class="col-header-table" style="width: 90%"><tr><td style="border: none">' + title 
-                        + ':</td><td style="border: none; width: 100%"><input class="col-filter" type="text" placeholder="Filter" /></td></tr></table>';
+                        + ':</td><td style="border: none; width: 100%"><input style="width: 100%; font-size: 1em;" type="text" placeholder="Filter" /></td></tr></table>';
                     $(this).html(html);
                 }
             });
