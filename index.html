@@ -44,6 +44,10 @@
         .col-header-td {
             border: none;
         }
+
+        .modal-body{
+            padding: 5px;
+        }
     </style>
 </head>
 
@@ -69,7 +73,7 @@
 
     <!-- Video Player Dialog -->
     <div class="modal fade video-dialog" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-lg" id="videoDialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -86,19 +90,28 @@
 
         var videoDialogPlayer;
         function onYouTubeIframeAPIReady() {
+
+            var vpWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+            var dialogWidth = vpWidth > 650 ? 650 : vpWidth;
+            $("#videoDialog").width(dialogWidth + "px");
+
+            var playerWidth = dialogWidth - 10
+            var playerHeight = 390 * playerWidth / 640;
+
             videoDialogPlayer = new YT.Player('videoDialogPlayer', {
-                height: '390',
-                width: '640'
+                height: playerHeight,
+                width: playerWidth
             });
         }
 
         var currentId = "X";
         var currentStart = 0;
-        var currentEnd = 0;
-        function updatePlayer(id, start, end) {
+        var currentEnd = 0;        
+        function updatePlayer(id, start, end, question) {
             currentId = id;
             currentStart = start;
             currentEnd = end;
+            $(".modal-title").text(question);
         }
 
         $(function () {
@@ -138,7 +151,7 @@
                 + ')' + '</div>' + '<p class="tags" style="font-size: 0.75em;">' + tags + '</p>';
         }
 
-        function getCommandCellHtml(link, duration) {
+        function getCommandCellHtml(link, duration, question) {
 
             var idIndex = link.indexOf("be/") + 3;
             var id = link.substring(idIndex, link.indexOf("?"));
@@ -148,7 +161,8 @@
 
             var end = start + parseInt(duration);
 
-            var html = '<a onclick="updatePlayer(' + "'" + id + "'," + start + ',' + end + ')" '
+            var html = '<a onclick="updatePlayer(' + "'" + id + "'," + start + ',' + end
+                + ",'" + question + "')" + '" '
                 + 'class="fragment-link youtube" href="#" data-toggle="modal" data-target=".video-dialog">';
 
             return html;
@@ -176,7 +190,7 @@
                         date: row["gsx$date"]["$t"],
                         videotitle: row["gsx$videotitle"]["$t"],
                         question: getQuestionCellHtml(row["gsx$question"]["$t"], row["gsx$tags"]["$t"], row["gsx$duration"]["$t"]),
-                        link: getCommandCellHtml(row["gsx$link"]["$t"], row["gsx$duration"]["$t"]),
+                        link: getCommandCellHtml(row["gsx$link"]["$t"], row["gsx$duration"]["$t"], row["gsx$question"]["$t"]),
                         duration: row["gsx$duration"]["$t"],
                         tags: row["gsx$tags"]["$t"]
                     });
