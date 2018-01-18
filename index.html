@@ -94,8 +94,7 @@
             $('#example thead th').each(function () {
                 var title = $(this).text();
                 if (title == "Вопрос" || title == "Дата" || title == "Видео") {
-                    var html = '<table class="col-header-table" style="width: 90%"><tr><td style="border: none">' + title 
-                        + ':</td><td style="border: none; width: 100%"><input style="width: 100%; font-size: 1em;" type="text" placeholder="Filter" /></td></tr></table>';
+                    var html = '<input style="width: 95%; font-size: 1em; min-width: 100px;" type="text" placeholder="' + title + '" />';
                     $(this).html(html);
                 }
             });
