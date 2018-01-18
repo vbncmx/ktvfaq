@@ -230,11 +230,7 @@
                 // Apply the search
                 table.columns().every(function () {
                     var that = this;
-
                     var input = $('input', this.header());
-                    
-
-
                     var timeout = null;
                     var searchFunction = function()
                     {
@@ -242,8 +238,7 @@
                             that.search(input.val()).draw();
                         }
                         timeout = null;
-                    };
-                    
+                    };                    
                     input.on('keyup change', function(){
                         if (timeout != null)
                         {
