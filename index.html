@@ -118,6 +118,10 @@
             {
                 dialogWidth = 10 + 640 * (vpHeight - 60) / 390;
             }
+            if (vpHeight < 450)
+            {                
+                $("#videoDialog").css('margin-top', '0px');
+            }
 
             $("#videoDialog").width(dialogWidth + "px");
 
