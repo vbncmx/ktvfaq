@@ -186,10 +186,12 @@
             var idIndex = link.indexOf("be/") + 3;
             var id = link.substring(idIndex, link.indexOf("?"));
 
-            var startIndex = link.indexOf("?t=") + 3;
-            var start = startIndex > 0
-                ? parseInt(link.substring(startIndex))
-                : 0;
+            var tIndex = link.indexOf("?t=");
+            var start = tIndex > 0
+                ? parseInt(link.substring(tIndex + 3))
+                : 1;
+                
+            if (start == 0) start = 1;
 
             var end = start + parseInt(duration);
 
