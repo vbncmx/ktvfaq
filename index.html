@@ -26,10 +26,20 @@
         }
 
         a.fragment-link {
+            display: block;
+            /* background: transparent url('yt.png') center top no-repeat; */
+        }
+
+        a.fragment-link img {
             width: 32px;
             height: 24px;
-            display: block;
-            background: transparent url('yt.png') center top no-repeat;
+        }
+
+        @media only screen and (max-width: 500px) {
+            a.fragment-link img {
+                width: 64px;
+                height: 48px;
+            }
         }
 
         .dataTables_filter {
@@ -45,15 +55,15 @@
             border: none;
         }
 
-        .modal-body{
+        .modal-body {
             padding: 5px;
         }
 
-        .modal-header{
+        .modal-header {
             padding: 5px;
         }
 
-        .modal-header h4{
+        .modal-header h4 {
             font-size: 1em;
             color: black;
         }
@@ -122,7 +132,7 @@
 
         var currentId = "X";
         var currentStart = 0;
-        var currentEnd = 0;        
+        var currentEnd = 0;
         function updatePlayer(id, start, end, question) {
             currentId = id;
             currentStart = start;
@@ -173,19 +183,20 @@
             var id = link.substring(idIndex, link.indexOf("?"));
 
             var startIndex = link.indexOf("?t=") + 3;
-            var start = parseInt(link.substring(startIndex));
+            var start = startIndex > 0
+                ? parseInt(link.substring(startIndex))
+                : 0;
 
             var end = start + parseInt(duration);
 
             var html = '<a onclick="updatePlayer(' + "'" + id + "'," + start + ',' + end
                 + ",'" + question + "')" + '" '
-                + 'class="fragment-link youtube" href="#" data-toggle="modal" data-target=".video-dialog">';
+                + 'class="fragment-link"  href="#" data-toggle="modal" data-target=".video-dialog"><img src="yt.png" /></a>';
+
+            // html += 
 
             return html;
         }
-
-
-
 
         $(document).ready(function () {
 
@@ -232,17 +243,15 @@
                     var that = this;
                     var input = $('input', this.header());
                     var timeout = null;
-                    var searchFunction = function()
-                    {
+                    var searchFunction = function () {
                         if (that.search() !== input.value) {
                             that.search(input.val()).draw();
                         }
                         timeout = null;
-                    };                    
-                    input.on('keyup change', function(){
-                        if (timeout != null)
-                        {
-                            window.clearTimeout(timeout);                            
+                    };
+                    input.on('keyup change', function () {
+                        if (timeout != null) {
+                            window.clearTimeout(timeout);
                         }
                         timeout = window.setTimeout(searchFunction, 1000);
                     });
