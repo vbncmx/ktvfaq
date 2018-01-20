@@ -56,7 +56,7 @@
         }
 
         .modal-body {
-            padding: 5px;
+            padding: 0;
         }
 
         .modal-header {
@@ -66,6 +66,23 @@
         .modal-header h4 {
             font-size: 1em;
             color: black;
+        }
+
+        #playback-progress {
+            /* position: fixed;
+            top: 0;
+            left: 0; */
+            width: 50%;
+            height: 2px;
+            background-color: rgb(255, 0, 0);
+            border-top-left-radius: 6px;
+            /* border-top: 1px solid rgba(0,0,0,.2);
+            border-left: 1px solid rgba(0,0,0,.2);
+            border-right: 1px solid rgba(0,0,0,.2); */
+        }
+
+        #videoDialogPlayer{
+            margin: 2px;
         }
     </style>
 </head>
@@ -94,179 +111,18 @@
     <div class="modal fade video-dialog" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg" id="videoDialog">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header">                    
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                     <h4 class="modal-title">Modal Header</h4>
                 </div>
                 <div class="modal-body">
+                    <div id="playback-progress"></div>
                     <div id="videoDialogPlayer" class="vidflex"></div>
                 </div>
             </div>
         </div>
     </div>
-
-    <script type="text/javascript">    
-
-        var videoDialogPlayer;
-        function onYouTubeIframeAPIReady() {
-
-            var vpWidth = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
-            var vpHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-            var dialogWidth = vpWidth > 650 ? 650 : vpWidth;
-            var dialogHeight = 40 + 390 * (dialogWidth - 10) / 640;
-            if (vpHeight < dialogHeight) // mobile lanscape case
-            {
-                dialogWidth = 10 + 640 * (vpHeight - 60) / 390;
-            }
-            if (vpHeight < 450)
-            {                
-                $("#videoDialog").css('margin-top', '0px');
-            }
-
-            $("#videoDialog").width(dialogWidth + "px");
-
-            var playerWidth = dialogWidth - 10
-            var playerHeight = 390 * playerWidth / 640;
-
-            videoDialogPlayer = new YT.Player('videoDialogPlayer', {
-                height: playerHeight,
-                width: playerWidth
-            });
-        }
-
-        var currentId = "X";
-        var currentStart = 0;
-        var currentEnd = 0;
-        function updatePlayer(id, start, end, question) {
-            currentId = id;
-            currentStart = start;
-            currentEnd = end;
-            $(".modal-title").text(question);
-        }
-
-        $(function () {
-            $('.video-dialog')
-                .on('shown.bs.modal', function () {
-                    videoDialogPlayer.loadVideoById({
-                        'videoId': currentId,
-                        'startSeconds': currentStart,
-                        'endSeconds': currentEnd
-                    });
-                }).on('hide.bs.modal', function () {
-                    videoDialogPlayer.stopVideo();
-                });
-        });
-
-        function fancyTimeFormat(time) {
-            // Hours, minutes and seconds
-            var hrs = ~~(time / 3600);
-            var mins = ~~((time % 3600) / 60);
-            var secs = time % 60;
-
-            // Output like "1:01" or "4:03:59" or "123:03:59"
-            var ret = "";
-
-            if (hrs > 0) {
-                ret += "" + hrs + ":" + (mins < 10 ? "0" : "");
-            }
-
-            ret += "" + mins + ":" + (secs < 10 ? "0" : "");
-            ret += "" + secs;
-            return ret;
-        }
-
-        function getQuestionCellHtml(question, tags, duration) {
-            return '<div class="question-text" style="font-size: 1em;">' + question
-                + ' (' + fancyTimeFormat(parseInt(duration))
-                + ')' + '</div>' + '<p class="tags" style="font-size: 0.75em;">' + tags + '</p>';
-        }
-
-        function getCommandCellHtml(link, duration, question) {
-
-            var idIndex = link.indexOf("be/") + 3;
-            var id = link.substring(idIndex, link.indexOf("?"));
-
-            var tIndex = link.indexOf("?t=");
-            var start = tIndex > 0
-                ? parseInt(link.substring(tIndex + 3))
-                : 1;
-                
-            if (start == 0) start = 1;
-
-            var end = start + parseInt(duration);
-
-            var html = '<a onclick="updatePlayer(' + "'" + id + "'," + start + ',' + end
-                + ",'" + question + "')" + '" '
-                + 'class="fragment-link"  href="#" data-toggle="modal" data-target=".video-dialog"><img src="yt.png" /></a>';
-
-            // html += 
-
-            return html;
-        }
-
-        $(document).ready(function () {
-
-            $('#example thead th').each(function () {
-                var title = $(this).text();
-                if (title == "Вопрос" || title == "Дата" || title == "Видео") {
-                    var html = '<input style="width: 95%; font-size: 1em; min-width: 100px;" type="text" placeholder="' + title + '" />';
-                    $(this).html(html);
-                }
-            });
-
-            $.getJSON("https://spreadsheets.google.com/feeds/list/1-MVggscH_a_6LPxylIa61KjlMbjRkjxUfH5cz87l7hI/3/public/full?alt=json", function (data) {
-
-                var gridData = [];
-
-                data.feed.entry.forEach(function (row) {
-                    gridData.push({
-                        date: row["gsx$date"]["$t"],
-                        videotitle: row["gsx$videotitle"]["$t"],
-                        question: getQuestionCellHtml(row["gsx$question"]["$t"], row["gsx$tags"]["$t"], row["gsx$duration"]["$t"]),
-                        link: getCommandCellHtml(row["gsx$link"]["$t"], row["gsx$duration"]["$t"], row["gsx$question"]["$t"]),
-                        duration: row["gsx$duration"]["$t"],
-                        tags: row["gsx$tags"]["$t"]
-                    });
-                });
-
-                var table = $('#example').DataTable({
-                    paging: false,
-                    fixedHeader: true,
-                    pageLength: 50,
-                    scrollY: '80vh',
-                    sDom: 'Rfrtlip',
-                    data: gridData,
-                    columns: [
-                        { "data": "link" },
-                        { "data": "question" },
-                        { "data": "videotitle" },
-                        { "data": "date", "type": "date" }
-                    ]
-                });
-
-                // Apply the search
-                table.columns().every(function () {
-                    var that = this;
-                    var input = $('input', this.header());
-                    var timeout = null;
-                    var searchFunction = function () {
-                        if (that.search() !== input.value) {
-                            that.search(input.val()).draw();
-                        }
-                        timeout = null;
-                    };
-                    input.on('keyup change', function () {
-                        if (timeout != null) {
-                            window.clearTimeout(timeout);
-                        }
-                        timeout = window.setTimeout(searchFunction, 1000);
-                    });
-                });
-            });
-        });
-
-
-    </script>
+    <script src="ktvfaq.js"></script>
 </body>
 
 </html>
