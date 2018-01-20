@@ -48,6 +48,10 @@ function onYouTubeIframeAPIReady() {
     }
 
     $("#videoDialog").width(dialogWidth + "px");
+    if (vpHeight < 450)
+    {                
+        $("#videoDialog").css('margin-top', '0px');
+    }
 
     var playerWidth = dialogWidth - playerMargin * 2 - 2;
     var playerHeight = 390 * playerWidth / 640;
@@ -149,7 +153,7 @@ function getCommandCellHtml(link, duration, question) {
 
     var html = '<a onclick="updatePlayer(' + "'" + id + "'," + start + ',' + end
         + ",'" + question + "')" + '" '
-        + 'class="fragment-link youtube" href="#" data-toggle="modal" data-target=".video-dialog">';
+        + 'class="fragment-link youtube" href="#" data-toggle="modal" data-target=".video-dialog"><img src="yt.png" /></a>';
 
     return html;
 }
