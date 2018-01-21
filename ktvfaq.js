@@ -32,6 +32,15 @@ function onPauseOrBuffering() {
     }
 }
 
+function getTimeFromYtLink(ytLink)
+{
+    var startIndex = ytLink.indexOf("?t=");
+    if (startIndex < 0)
+        return 0;
+    startIndex += 3;
+    return parseInt(ytLink.substring(startIndex));
+}
+
 function onYouTubeIframeAPIReady() {
 
 
@@ -137,20 +146,11 @@ function fancyTimeFormat(time) {
 
 function getQuestionCellHtml(question, tags, duration) {
     return '<div class="question-text" style="font-size: 1em;">' + question
-        + ' (' + fancyTimeFormat(parseInt(duration))
+        + ' (' + fancyTimeFormat(duration)
         + ')' + '</div>' + '<p class="tags" style="font-size: 0.75em;">' + tags + '</p>';
 }
 
-function getCommandCellHtml(link, duration, question) {
-
-    var idIndex = link.indexOf("be/") + 3;
-    var id = link.substring(idIndex, link.indexOf("?"));
-
-    var startIndex = link.indexOf("?t=") + 3;
-    var start = parseInt(link.substring(startIndex));
-
-    var end = start + parseInt(duration);
-
+function getCommandCellHtml(id, start, end, question) {
     var html = '<a onclick="updatePlayer(' + "'" + id + "'," + start + ',' + end
         + ",'" + question + "')" + '" '
         + 'class="fragment-link youtube" href="#" data-toggle="modal" data-target=".video-dialog"><img src="yt.png" /></a>';
@@ -173,13 +173,24 @@ $(document).ready(function () {
         var gridData = [];
 
         data.feed.entry.forEach(function (row) {
+
+            
+            var startLink = row["gsx$link"]["$t"];
+            var endLink = row["gsx$linkend"]["$t"];
+            var start = getTimeFromYtLink(startLink);
+            console.log(startLink + " : " + start);
+
+            var end = getTimeFromYtLink(endLink);
+            var duration = end - start;
+            var idIndex = startLink.indexOf("be/") + 3;
+            var id = startLink.substring(idIndex, startLink.indexOf("?"));
+            var question = row["gsx$question"]["$t"];
+
             gridData.push({
                 date: row["gsx$date"]["$t"],
                 videotitle: row["gsx$videotitle"]["$t"],
-                question: getQuestionCellHtml(row["gsx$question"]["$t"], row["gsx$tags"]["$t"], row["gsx$duration"]["$t"]),
-                link: getCommandCellHtml(row["gsx$link"]["$t"], row["gsx$duration"]["$t"], row["gsx$question"]["$t"]),
-                duration: row["gsx$duration"]["$t"],
-                tags: row["gsx$tags"]["$t"]
+                question: getQuestionCellHtml(question, row["gsx$tags"]["$t"], duration),
+                link: getCommandCellHtml(id, start, end, question),
             });
         });
 
