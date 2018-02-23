@@ -32,8 +32,7 @@ function onPauseOrBuffering() {
     }
 }
 
-function getTimeFromYtLink(ytLink)
-{
+function getTimeFromYtLink(ytLink) {
     var startIndex = ytLink.indexOf("?t=");
     if (startIndex < 0)
         return 0;
@@ -57,8 +56,7 @@ function onYouTubeIframeAPIReady() {
     }
 
     $("#videoDialog").width(dialogWidth + "px");
-    if (vpHeight < 450)
-    {                
+    if (vpHeight < 450) {
         $("#videoDialog").css('margin-top', '0px');
     }
 
@@ -168,64 +166,49 @@ $(document).ready(function () {
         }
     });
 
-    $.getJSON("https://spreadsheets.google.com/feeds/list/1-MVggscH_a_6LPxylIa61KjlMbjRkjxUfH5cz87l7hI/3/public/full?alt=json", function (data) {
+    var gridData = [];
 
-        var gridData = [];
-
-        data.feed.entry.forEach(function (row) {
-
-            
-            var startLink = row["gsx$link"]["$t"];
-            var endLink = row["gsx$linkend"]["$t"];
-            var start = getTimeFromYtLink(startLink);
-            console.log(startLink + " : " + start);
-
-            var end = getTimeFromYtLink(endLink);
-            var duration = end - start;
-            var idIndex = startLink.indexOf("be/") + 3;
-            var id = startLink.substring(idIndex, startLink.indexOf("?"));
-            var question = row["gsx$question"]["$t"];
-
-            gridData.push({
-                date: row["gsx$date"]["$t"],
-                videotitle: row["gsx$videotitle"]["$t"],
-                question: getQuestionCellHtml(question, row["gsx$tags"]["$t"], duration),
-                link: getCommandCellHtml(id, start, end, question),
-            });
+    fragmentData.forEach(function (row) {
+        var duration = row.end - row.start;
+        gridData.push({
+            date: new Date(row.videoTimestamp),
+            videotitle: row.videoTitle,
+            question: getQuestionCellHtml(row.description, row.tags, duration),
+            link: getCommandCellHtml(row.videoId, row.start, row.end, row.description),
         });
+    });
 
-        var table = $('#example').DataTable({
-            paging: false,
-            fixedHeader: true,
-            pageLength: 50,
-            scrollY: '80vh',
-            sDom: 'Rfrtlip',
-            data: gridData,
-            columns: [
-                { "data": "link" },
-                { "data": "question" },
-                { "data": "videotitle" },
-                { "data": "date", "type": "date" }
-            ]
-        });
+    var table = $('#example').DataTable({
+        paging: false,
+        fixedHeader: true,
+        pageLength: 50,
+        scrollY: '80vh',
+        sDom: 'Rfrtlip',
+        data: gridData,
+        columns: [
+            { "data": "link" },
+            { "data": "question" },
+            { "data": "videotitle" },
+            { "data": "date", "type": "date" }
+        ]
+    });
 
-        // Apply the search
-        table.columns().every(function () {
-            var that = this;
-            var input = $('input', this.header());
-            var timeout = null;
-            var searchFunction = function () {
-                if (that.search() !== input.value) {
-                    that.search(input.val()).draw();
-                }
-                timeout = null;
-            };
-            input.on('keyup change', function () {
-                if (timeout != null) {
-                    window.clearTimeout(timeout);
-                }
-                timeout = window.setTimeout(searchFunction, 1000);
-            });
+    // Apply the search
+    table.columns().every(function () {
+        var that = this;
+        var input = $('input', this.header());
+        var timeout = null;
+        var searchFunction = function () {
+            if (that.search() !== input.value) {
+                that.search(input.val()).draw();
+            }
+            timeout = null;
+        };
+        input.on('keyup change', function () {
+            if (timeout != null) {
+                window.clearTimeout(timeout);
+            }
+            timeout = window.setTimeout(searchFunction, 1000);
         });
     });
 });
