@@ -171,7 +171,7 @@ $(document).ready(function () {
     fragmentData.forEach(function (row) {
         var duration = row.fragment.end - row.fragment.start;
         gridData.push({
-            date: new Date(row.videoTimestamp),
+            date: new Date(row.videoTimestamp).toDateString(),
             videotitle: row.videoTitle,
             question: getQuestionCellHtml(row.fragment.description, row.fragment.tags, duration),
             link: getCommandCellHtml(row.videoId, row.fragment.start, row.fragment.end, row.fragment.description),
