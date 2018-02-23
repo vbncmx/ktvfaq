@@ -169,12 +169,12 @@ $(document).ready(function () {
     var gridData = [];
 
     fragmentData.forEach(function (row) {
-        var duration = row.end - row.start;
+        var duration = row.fragment.end - row.fragment.start;
         gridData.push({
             date: new Date(row.videoTimestamp),
             videotitle: row.videoTitle,
-            question: getQuestionCellHtml(row.description, row.tags, duration),
-            link: getCommandCellHtml(row.videoId, row.start, row.end, row.description),
+            question: getQuestionCellHtml(row.fragment.description, row.fragment.tags, duration),
+            link: getCommandCellHtml(row.videoId, row.fragment.start, row.fragment.end, row.fragment.description),
         });
     });
 
